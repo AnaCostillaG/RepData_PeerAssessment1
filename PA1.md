@@ -62,8 +62,8 @@ hist(dailysteps)
 2. Calculate and report the mean and median total number of steps taken per day
 
 ```r
-mean <- mean(dailysteps, na.rm=TRUE)
-median <- median(dailysteps, na.rm=TRUE)
+fmean <- mean(dailysteps, na.rm=TRUE)
+fmedian <- median(dailysteps, na.rm=TRUE)
 ```
 the `mean` is 1.0767189\times 10^{4}
 the `median` is 1.0766\times 10^{4}
@@ -81,9 +81,9 @@ plot(intervalsteps,type='l')
 2.Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
 ```r
-interval <- which(intervalsteps == max(intervalsteps))
+interval <- names(intervalsteps[intervalsteps == max(intervalsteps)])
 ```
-The interval with the maximum average steps is 104
+The interval with the maximum average steps is 835
 
 ## Imputing missing values
 
@@ -95,15 +95,58 @@ total_missing <- sum(is.na(activity))
 The total numver of missing values in the data set is 2304
 
 2.Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.
-``` R
-``` 
+the activity to use will be considering NAs like 0s
+
+```r
+activityimp <- activity 
+```
 3.Create a new dataset that is equal to the original dataset but with the missing data filled in.
 ``` R
+activityimp[is.na(activityimp[1]),1] <- 0
 ``` 
 4.Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
-``` R
-``` 
+
+```r
+ndailysteps <- tapply(activityimp$steps,activityimp$date, FUN=sum)
+hist(ndailysteps)
+```
+
+![](PA1_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
+
+```r
+nmean <- mean(ndailysteps)
+nmedian <- median(ndailysteps, na.rm=TRUE)
+```
+the new mean is NA, NA is the difference between the first calculation and the current one.  
+the new median is 1.0765\times 10^{4}, 1 is the difference between the first calculation and the current one
 
 ## Are there differences in activity patterns between weekdays and weekends?
-``` R
-``` 
+1. Create a new factor variable in the dataset with two levels -- "weekday" and "weekend" indicating whether a given date is a weekday or weekend day.
+
+
+```r
+weekdays <- c('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday')
+activity['weekday']<-as.Date(activityimp$date)
+activity['weekday']<-factor((weekdays(activity$weekday) %in% weekdays), levels=c(FALSE, TRUE), labels=c('wknd', 'wkdy'))
+```
+
+2. Make a panel plot containing a time series plot (i.e. `type = "l"`) of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). 
+
+```r
+library("plyr")
+require("ggplot2")
+```
+
+```
+## Loading required package: ggplot2
+```
+
+```r
+qplot(activity$interval,activity$steps, geom='line', facets=weekday~., data=arrange(activity, weekday))
+```
+
+```
+## Warning: Removed 2 rows containing missing values (geom_path).
+```
+
+![](PA1_files/figure-html/unnamed-chunk-11-1.png)<!-- -->

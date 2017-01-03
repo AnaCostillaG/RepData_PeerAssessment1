@@ -92,5 +92,7 @@ activityimp['weekday']<-factor((weekdays(activityimp$weekday) %in% weekdays), le
 
 2. Make a panel plot containing a time series plot (i.e. `type = "l"`) of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). 
 ``` {r}
+library("plyr")
+require("ggplot2")
 qplot(activityimp$interval,activityimp$steps, geom='line', facets=weekday~., data=arrange(activityimp, weekday))
 ```
